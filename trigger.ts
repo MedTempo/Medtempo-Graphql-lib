@@ -1,21 +1,25 @@
-
 import CRUD_GRAPHQL from "./definitions.ts";
 
-interface db_return{
+interface db_return {
   data: {
     mytable: {
-      values: Array<any>
-    }
-  }
+      values: Array<any>;
+    };
+  };
 }
 
-let instance = new CRUD_GRAPHQL();
+let instance = new CRUD_GRAPHQL({
+  id: Deno.env.get(`DB_ID`) || ``,
+  region: Deno.env.get(`DB_REGION`) || ``,
+  keyspace: Deno.env.get(`DB_KEYSPACE`) || ``,
+  token: Deno.env.get(
+    `DB_APPLICATION_TOKEN`,
+  ) || ``,
+});
 
 instance.debug = true;
 
 //instance.Show();
-
-instance.CheckUndefined()
 
 instance.Execute(`query{
     mytable{    
@@ -38,17 +42,16 @@ let testeInsert = await instance.Execute(
     }
   }`,
   {
-    myname: `Mateus`
+    myname: `Mateus`,
   },
 );
 
-console.log(testeInsert.data.mytable.values)
+console.log(testeInsert.data.mytable.values);
 
-
-instance.Execute(`mutation{
+instance.Execute(`mutation ($myname: String){
   insertmytable(
       value: {
-          firstname: "TesteInsert"
+          firstname: $myname
           lastname: "by API"
           favorite_color: "black"
       }
@@ -59,8 +62,9 @@ instance.Execute(`mutation{
           favorite_color
       }
   }
-}`)
-
+}`, {
+  myname: `NOVO HELLO`
+});
 
 let teste: db_return = await instance.Execute(`query{
   mytable{    
@@ -72,4 +76,4 @@ let teste: db_return = await instance.Execute(`query{
   }
 }`);
 
-console.log(teste.data.mytable.values)
+console.log(teste.data.mytable.values);

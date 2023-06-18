@@ -15,8 +15,8 @@ export default class CRUD_GRAPHQL {
   private DB_KEYSPACE: string
   private DB_APPLICATION_TOKEN: string
 
-  private DB_URL =
-    `https://${this.DB_ID}-${this.DB_REGION}.apps.astra.datastax.com/api/graphql/${this.DB_KEYSPACE}/`;
+  private DB_URL: string
+  private Mount_Fetch: RequestInit 
 
 
   constructor(config: config){
@@ -24,17 +24,31 @@ export default class CRUD_GRAPHQL {
     this.DB_ID = config.id
     this.DB_KEYSPACE = config.keyspace
     this.DB_APPLICATION_TOKEN = config.token
+
+    this.DB_URL = `https://${this.DB_ID}-${this.DB_REGION}.apps.astra.datastax.com/api/graphql/${this.DB_KEYSPACE}/`;
+
+
+    this.Mount_Fetch = {
+      method: `POST`,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Cassandra-Token": this.DB_APPLICATION_TOKEN,
+      },
+    };
+
+
+    this.CheckUndefined()
   }
 
-  /*
+  
   public CheckUndefined(){
-    if(typeof this.DB_ID != `string` || typeof this.DB_REGION != `string` || typeof this.DB_KEYSPACE != `string` || typeof this.DB_APPLICATION_TOKEN != `string`){
+    if( this.DB_ID == `` ||  this.DB_REGION == `` ||  this.DB_KEYSPACE == `` ||  this.DB_APPLICATION_TOKEN == ``){
       console.error(`Env Variables Undenined`)
 
       Deno.exit(1)
     }
   }
-  */
+  
 
   public Show() {
     console.log(`Local: ${this.DB_REGION}`);
@@ -48,14 +62,6 @@ export default class CRUD_GRAPHQL {
     console.log(`\n\nDb connection url: ${this.DB_URL}`);
   }
 
-  private Mount_Fetch: RequestInit = {
-    method: `POST`,
-    headers: {
-      "Content-Type": "application/json",
-      "X-Cassandra-Token": this.DB_APPLICATION_TOKEN,
-    },
-  };
-
   private async Fetch(generic_query: string, vars?: graphvars) {
     //console.log(this.Mount_Fetch);
 
@@ -63,7 +69,7 @@ export default class CRUD_GRAPHQL {
 
     Fetch_Params["body"] = JSON.stringify({ query: generic_query, variables: vars });
 
-    //console.log(Fetch_Params["body"])
+    console.log(Fetch_Params["body"])
 
     let db_response = await fetch(this.DB_URL, Fetch_Params);
 
