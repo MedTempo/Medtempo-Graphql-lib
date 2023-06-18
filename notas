@@ -1,7 +1,0 @@
-  public DB_REGION = Deno.env.get(`DB_REGION`);
-
-  private DB_ID = Deno.env.get(`DB_ID`);
-  private DB_KEYSPACE = Deno.env.get(`DB_KEYSPACE`);
-  private DB_APPLICATION_TOKEN: string = Deno.env.get(
-    `DB_APPLICATION_TOKEN`,
-  );
