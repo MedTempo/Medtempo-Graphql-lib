@@ -1,0 +1,15 @@
+mutation{
+    insertmytable(
+        value: {
+            firstname: "TesteInsert"
+            lastname: "by API"
+            favorite_color: "black"
+        }
+    ) {
+        value{
+            firstname
+            lastname
+            favorite_color
+        }
+    }
+}
