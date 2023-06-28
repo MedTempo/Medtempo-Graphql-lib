@@ -21,7 +21,7 @@ import CRUD_GRAPHQL from "./definitions.ts";
 
 interface db_return {
   data: {
-    mytable: {
+    usuario_pessoal: {
       values: Array<any>;
     };
   };
@@ -39,7 +39,7 @@ let instance = new CRUD_GRAPHQL({
 instance.debug = true;
 
 //instance.Show();
-
+/*
 instance.Execute(`query{
     mytable{    
         values{
@@ -96,3 +96,26 @@ let teste: db_return = await instance.Execute(`query{
 }`);
 
 console.log(teste.data.mytable.values);
+*/
+
+let teste: db_return = await instance.Execute(`query{
+  usuario_pessoal{    
+      values{
+        id
+      }
+  }
+}`);
+
+console.log(teste.data.usuario_pessoal.values);
+
+
+let teste2: db_return = await instance.Schema(`mutation DropAnyTable($table: String!){
+  drop: dropTable(keyspaceName:"medtempo", tableName: $table)
+}`, 
+  {
+    "table": "usuario_pessoal",
+
+}
+)
+
+console.log(teste)

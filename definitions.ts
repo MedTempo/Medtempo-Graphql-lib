@@ -35,6 +35,7 @@ export default class CRUD_GRAPHQL {
   private DB_APPLICATION_TOKEN: string
 
   private DB_URL: string
+  private DB_URL_SCHEMA: string
   private Mount_Fetch: RequestInit 
 
 
@@ -44,7 +45,10 @@ export default class CRUD_GRAPHQL {
     this.DB_KEYSPACE = config.keyspace
     this.DB_APPLICATION_TOKEN = config.token
 
-    this.DB_URL = `https://${this.DB_ID}-${this.DB_REGION}.apps.astra.datastax.com/api/graphql/${this.DB_KEYSPACE}/`;
+    let url_struct = `https://${this.DB_ID}-${this.DB_REGION}.apps.astra.datastax.com/api/graphql`;
+    
+    this.DB_URL = `${url_struct}/${this.DB_KEYSPACE}`;
+    this.DB_URL_SCHEMA = `${url_struct}-schema`
 
 
     this.Mount_Fetch = {
@@ -62,7 +66,7 @@ export default class CRUD_GRAPHQL {
   
   public CheckUndefined(){
     if( this.DB_ID == `` ||  this.DB_REGION == `` ||  this.DB_KEYSPACE == `` ||  this.DB_APPLICATION_TOKEN == ``){
-      console.error(`Env Variables Undenined`)
+      console.error(`Env Variables ${undefined}`)
 
       Deno.exit(1)
     }
@@ -81,8 +85,17 @@ export default class CRUD_GRAPHQL {
     console.log(`\n\nDb connection url: ${this.DB_URL}`);
   }
 
-  private async Fetch(generic_query: string, vars?: graphvars) {
+  private async Fetch(generic_query: string, is_adm: boolean, vars?: graphvars) {
     //console.log(this.Mount_Fetch);
+
+    let url: string
+    if (is_adm === true) {
+      url = this.DB_URL_SCHEMA
+    }
+    else{
+      url = this.DB_URL
+    }
+    
 
     let Fetch_Params = this.Mount_Fetch;
 
@@ -90,7 +103,7 @@ export default class CRUD_GRAPHQL {
 
     console.log(Fetch_Params["body"])
 
-    let db_response = await fetch(this.DB_URL, Fetch_Params);
+    let db_response = await fetch(url, Fetch_Params);
 
     let query_result = await db_response.json();
     console.log(query_result);
@@ -99,6 +112,10 @@ export default class CRUD_GRAPHQL {
   }
 
   public async Execute(create_query: string, vars?: graphvars) {
-    return await this.Fetch(create_query, vars);
+    return await this.Fetch(create_query, false, vars);
+  }
+
+  public async Schema(create_query: string, vars?: graphvars,){
+    return await this.Fetch(create_query, true, vars)
   }
 }
